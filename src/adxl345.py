@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # ADXL345 Python library for Raspberry Pi 
 #
 # author:  Jonathan Williamson
