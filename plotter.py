@@ -8,7 +8,6 @@ from kivy.graphics.context import Clock
 from kivy.graphics.context_instructions import Color
 from kivy.graphics.vertex_instructions import Ellipse, Line
 from kivy.uix.widget import Widget
-from math import sin
 from kivy.garden.graph import *
 
 

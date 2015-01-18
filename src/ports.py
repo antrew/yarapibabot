@@ -12,13 +12,13 @@ led_output_port=1
 # MOTOR DRIVER PORTS
 
 # input 1 of the driver
-motor_left_backward=6
+port_motor_left_backward=6
 
 # input 2 of the driver
-motor_left_forward=13
+port_motor_left_forward=13
 
 # input 3 of the driver
-motor_right_backward=19
+port_motor_right_backward=19
 
 # input 4 of the driver
-motor_right_forward=26
+port_motor_right_forward=26
