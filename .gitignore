@@ -54,3 +54,4 @@ docs/_build/
 target/
 .project
 .pydevproject
+.settings/
