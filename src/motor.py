@@ -1,4 +1,8 @@
+import logging
+
 import wiringpi2
+
+
 class Motor:
     def __init__(self, backward_port, forward_port):
         self.backward_port = backward_port
@@ -11,12 +15,19 @@ class Motor:
         self.current_direction = 0
         
         self.integral_error = 0
+        self.logger = logging.getLogger(__name__)
         
     def set_value(self, new_value, dt):
+        # limit the target value to the range -1 .. 1
+        if new_value > 1:
+            new_value = 1
+        if new_value < -1:
+            new_value = -1
+        
         self.target_value = new_value
         
         # current error
-        error = self.target_value - self.current_direction
+        error = self.current_direction - self.target_value 
         # integral error
         self.integral_error += error * dt
 
@@ -32,6 +43,8 @@ class Motor:
                 self.current_direction = -1
         else:
             self.current_direction = 0
+
+        self.logger.debug("target_value={} error={} integral_error={} direction={}".format(self.target_value, error, self.integral_error, self.current_direction))
 
         if self.current_direction > 0:
             # forward

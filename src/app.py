@@ -1,6 +1,10 @@
 #!/usr/bin/env python
+import logging
+
 from control import ControlThread
 
+
+logging.basicConfig(level=logging.DEBUG)
 
 # start the main control thread
 controlThread = ControlThread()

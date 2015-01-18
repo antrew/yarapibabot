@@ -1,9 +1,12 @@
+import logging
+from math import atan2
 from threading import Thread
+from time import time, sleep
+
+from adxl345 import ADXL345
 from motor import Motor
 from ports import port_motor_left_backward, port_motor_left_forward
-from time import time
-from adxl345 import ADXL345
-from math import atan2
+
 
 class ControlThread(Thread):
     def __init__(self, group=None, target=None, name=None,
@@ -26,6 +29,8 @@ class ControlThread(Thread):
         self.accelerometer = ADXL345()
 
         self.last_time = time()
+
+        self.logger = logging.getLogger(__name__)
 
     def run(self):
         while True:
@@ -56,6 +61,9 @@ class ControlThread(Thread):
         
         u = self.Kp * error + self.Ki * self.integral_error + self.Kd * differential_error
         
+        self.logger.debug('u={} dt={}'.format(u, dt * 1000))
+        
         # TODO control the motor
         self.motor.set_value(u, dt)
-        
+
+        sleep(10. / 1000.)
