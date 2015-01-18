@@ -25,7 +25,13 @@ class ControlThread(Thread):
         
         self.accelerometer = ADXL345()
 
+        self.last_time = time()
+
     def run(self):
+        while True:
+            self.perform_one_step()
+
+    def perform_one_step(self):
         # TODO read sensors
         axes = self.accelerometer.getAxes(True)
         z = axes['z']

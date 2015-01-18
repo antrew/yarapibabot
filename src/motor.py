@@ -10,6 +10,8 @@ class Motor:
         # -1, 0, 1
         self.current_direction = 0
         
+        self.integral_error = 0
+        
     def set_value(self, new_value, dt):
         self.target_value = new_value
         
