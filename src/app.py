@@ -18,4 +18,8 @@ controlThread.start()
 # - error, direction, target_value in Motor
 # TODO display this all in multiple charts in plotter.py
 
-controlThread.join()
+try:
+    while True:
+        controlThread.join(0.5)
+except (KeyboardInterrupt, SystemExit):
+    print "caught exception, exiting..."

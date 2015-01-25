@@ -3,8 +3,8 @@ from math import atan2
 from threading import Thread
 from time import time, sleep
 
-from adxl345 import ADXL345
 from motor import Motor
+from mpu6050 import MPU6050
 from ports import port_motor_left_backward, port_motor_left_forward
 
 
@@ -26,11 +26,14 @@ class ControlThread(Thread):
         self.last_error = 0
         self.motor = Motor(port_motor_left_backward, port_motor_left_forward)
         
-        self.accelerometer = ADXL345()
+        # self.accelerometer = ADXL345()
+        self.accelerometer = MPU6050()
 
         self.last_time = time()
 
         self.logger = logging.getLogger(__name__)
+
+        self.setDaemon(True)
 
     def run(self):
         while True:
