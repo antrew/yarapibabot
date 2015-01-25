@@ -42,6 +42,7 @@ class ControlThread(Thread):
     def perform_one_step(self):
         # TODO read sensors
         axes = self.accelerometer.getAxes(True)
+        self.latest_sensor = axes
         z = axes['z']
         x = axes['x']
         accelerometerAngle = atan2(x, z)
