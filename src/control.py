@@ -5,7 +5,7 @@ from time import time, sleep
 
 from motor import Motor
 from mpu6050 import MPU6050
-from ports import port_motor_left_backward, port_motor_left_forward
+from ports import port_motor_left_backward, port_motor_left_forward, port_motor_right_backward, port_motor_right_forward
 
 
 class ControlThread(Thread):
@@ -24,7 +24,8 @@ class ControlThread(Thread):
         
         self.integral_error = 0
         self.last_error = 0
-        self.motor = Motor(port_motor_left_backward, port_motor_left_forward)
+        self.motor_left = Motor("L", port_motor_left_backward, port_motor_left_forward)
+        self.motor_right = Motor("R", port_motor_right_backward, port_motor_right_forward)
         
         # self.accelerometer = ADXL345()
         self.accelerometer = MPU6050()
@@ -67,7 +68,8 @@ class ControlThread(Thread):
         
         self.logger.debug('u={} dt={}'.format(u, dt * 1000))
         
-        # TODO control the motor
-        self.motor.set_value(u, dt)
+        # control the motors
+        self.motor_left.set_value(u, dt)
+        self.motor_right.set_value(u, dt)
 
         sleep(10. / 1000.)

@@ -4,12 +4,13 @@ import wiringpi2
 
 
 class Motor:
-    def __init__(self, backward_port, forward_port):
+    def __init__(self, name, backward_port, forward_port):
+        self.name = name
         self.backward_port = backward_port
         self.forward_port = forward_port
         # initialize Raspberry Pi ports for output
-        wiringpi2.pinMode(backward_port, wiringpi2.GPIO.OUTPUT)
-        wiringpi2.pinMode(forward_port, wiringpi2.GPIO.OUTPUT)
+        wiringpi2.pinMode(self.backward_port, wiringpi2.GPIO.OUTPUT)
+        wiringpi2.pinMode(self.forward_port, wiringpi2.GPIO.OUTPUT)
         
         # -1, 0, 1
         self.current_direction = 0
@@ -44,7 +45,7 @@ class Motor:
         else:
             self.current_direction = 0
 
-        self.logger.debug("target_value={} error={} integral_error={} direction={}".format(self.target_value, error, self.integral_error, self.current_direction))
+        self.logger.debug("{}: target_value={} error={} integral_error={} direction={}".format(self.name, self.target_value, error, self.integral_error, self.current_direction))
 
         if self.current_direction > 0:
             # forward
