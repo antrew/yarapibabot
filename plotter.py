@@ -90,7 +90,7 @@ class MyApp(App):
 
     def get_accelerometer(self):
         connection = httplib.HTTPConnection('raspberrypi:8080')
-        connection.request('GET', '/accel')
+        connection.request('GET', '/sensors')
         response = connection.getresponse()
         axes = json.load(response)
         return axes
@@ -107,9 +107,9 @@ class MyApp(App):
             # TODO request accelerometer values from the http://raspberrypi:8080/accel
             
             axes = self.get_accelerometer()
-            self.plot_x.points.append([self.my_t, axes['x']])
-            self.plot_y.points.append([self.my_t, axes['y']])
-            self.plot_z.points.append([self.my_t, axes['z']])
+            self.plot_x.points.append([self.my_t, axes['sensors']['x']])
+            self.plot_y.points.append([self.my_t, axes['sensors']['y']])
+            self.plot_z.points.append([self.my_t, axes['sensors']['z']])
             self.my_t += 1
 
             if self.my_t > self.graph.xmax:

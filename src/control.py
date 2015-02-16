@@ -1,11 +1,12 @@
-import logging
 from math import atan2
+import logging
 from threading import Thread
 from time import time, sleep
 
 from motor import Motor
 from mpu6050 import MPU6050
 from ports import port_motor_left_backward, port_motor_left_forward, port_motor_right_backward, port_motor_right_forward
+import math
 
 
 class ControlThread(Thread):
@@ -16,11 +17,11 @@ class ControlThread(Thread):
         self.K = 0.98
 
         # TODO find better values        
-        self.Kp = 0.5
+        self.Kp = 6
         self.Ki = 0
         self.Kd = 0
         
-        self.set_point = 0
+        self.set_point = 0 #0.09
         
         self.integral_error = 0
         self.last_error = 0
@@ -35,38 +36,44 @@ class ControlThread(Thread):
         self.logger = logging.getLogger(__name__)
 
         self.setDaemon(True)
+        self.latest_sensor = 0
 
     def run(self):
         while True:
             self.perform_one_step()
 
     def perform_one_step(self):
-        # TODO read sensors
+        # read sensors
         axes = self.accelerometer.getAxes(True)
         self.latest_sensor = axes
         z = axes['z']
         x = axes['x']
-        accelerometerAngle = atan2(x, z)
-        # TODO read gyroscope
-        gyroscopeRate = 0
+        accelerometerAngle = atan2(-x, -z)
+        # read gyroscope
+        gyroscopeRate = -axes['gy'] / 180 * math.pi
         
         # TODO calculate dt based on the current time and the previous measurement time
         now = time()
         dt = now - self.last_time
+        self.dt = dt
         self.last_time = now 
         
         # complementary filter
         self.angle = self.K * (self.angle + gyroscopeRate * dt) + (1 - self.K) * accelerometerAngle
 
         # TODO PID
-        error = self.set_point - self.angle
+        error = self.angle - self.set_point
         self.integral_error += error * dt
         differential_error = (error - self.last_error) / dt
         self.last_error = error
         
         u = self.Kp * error + self.Ki * self.integral_error + self.Kd * differential_error
+        self.u = u
         
-        self.logger.debug('u={} dt={}'.format(u, dt * 1000))
+        self.logger.debug(
+            'x={:5.2f} z={:5.2f} gy={:7.2f} accelAngle={:5.2f} gyrAngle={:5.2f} angle={:5.2f} e={:5.2f} ie={:5.2f} de={:5.2f} u={:5.2f} dt={:3.0f}'
+                .format(
+                    x, z, gyroscopeRate, accelerometerAngle, gyroscopeRate * dt, self.angle, error, self.integral_error, differential_error, u, dt * 1000))
         
         # control the motors
         self.motor_left.set_value(u, dt)
