@@ -137,7 +137,6 @@ class SensorsBoxLayout(BoxLayout):
         self.ids.control_graph.add_plot(self.control_plot_u)
 
     def refresh_plot(self, sensor_data):
-        # TODO request accelerometer values from the http://raspberrypi:8080/accel   
         
         if self.t > self.ids.accel_graph.xmax:
             #reset t

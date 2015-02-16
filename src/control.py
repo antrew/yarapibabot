@@ -52,7 +52,7 @@ class ControlThread(Thread):
         # read gyroscope
         gyroscopeRate = -axes['gy'] / 180 * math.pi
         
-        # TODO calculate dt based on the current time and the previous measurement time
+        # calculate dt based on the current time and the previous measurement time
         now = time()
         dt = now - self.last_time
         self.dt = dt
@@ -61,7 +61,7 @@ class ControlThread(Thread):
         # complementary filter
         self.angle = self.K * (self.angle + gyroscopeRate * dt) + (1 - self.K) * accelerometerAngle
 
-        # TODO PID
+        # PID
         error = self.angle - self.set_point
         self.integral_error += error * dt
         differential_error = (error - self.last_error) / dt
@@ -79,4 +79,4 @@ class ControlThread(Thread):
         self.motor_left.set_value(u, dt)
         self.motor_right.set_value(u, dt)
 
-        sleep(10. / 1000.)
+        #sleep(10. / 1000.)
