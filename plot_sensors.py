@@ -18,15 +18,9 @@ Builder.load_file('plotter.kv')
 
 class SensorsBoxLayout(BoxLayout):
     
-    #list for storing t values
-    pt = ListProperty([])
-    #initialize t
-    t = 0
-    
     def __init__(self):
         super(BoxLayout, self).__init__()
-        self.pt = [self.t]
-        
+        self.t = 0
         self.create_plots()
         self.roll_plots()
         self.create_plots()
@@ -82,6 +76,8 @@ class SensorsBoxLayout(BoxLayout):
         self.control_plot_integral_error.points.append ([self.t, sensor_data['control']['integral_error']])
         self.control_plot_u.points.append              ([self.t, sensor_data['control']['u']])
 
+        self.t += 1
+
         if self.t > self.ids.accel_graph.xmax:
             self.roll_plots()
             self.create_plots()
@@ -121,15 +117,14 @@ class PlotSensorsApp(App):
     def on_start(self):
         
         def plot_sensors_callback(dt):
-            self.mySensorsBoxLayout.t += self.TIME_AXIS_INCREMENT
-            self.k = self.mySensorsBoxLayout.t
             # True - use real HTTP server
             # False - use fake values
             if False:
                 sensor_data = self.get_sensors_data()
             else:
                 sensor_data = self.get_fake_sensor_data()
-            self.mySensorsBoxLayout.refresh_plot(sensor_data)
+            for single_data_set in sensor_data:
+                self.mySensorsBoxLayout.refresh_plot(single_data_set)
              
         # call my_plot_sensors_callback every 0.1 seconds
         Clock.schedule_interval(plot_sensors_callback, self.REFRESH_TIME)
@@ -142,12 +137,15 @@ class PlotSensorsApp(App):
         return axes
 
     def get_fake_sensor_data(self):
+        # simulate that we get an array of log points from the server
         log_values = []
-        for i in range(1, 5):
+        for i in range(1, 10):
             log_values.append(self.get_fake_sensor_data_single_point())
-        return log_values[1]
+        return log_values
 
     def get_fake_sensor_data_single_point(self):
+        self.k += 0.02
+
         # generate some dummy values for sensors' data
         dummy_accel_x_values = exp(-(self.k - 0.5) ** 2 / (2 * .25 ** 2))
         dummy_accel_y_values = exp(-(self.k - 0.5) ** 4 / (2 * .25 ** 2))
