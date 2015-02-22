@@ -6,9 +6,10 @@ import time
 
 import wiringpi2
 
-from bottle import Bottle
+from bottle import Bottle, response
 from control import ControlThread
 import ports
+from json import dumps
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -36,18 +37,10 @@ web_server = Bottle()
 @web_server.route('/sensors')
 def sensors():
     global controlThread
-    axes = controlThread.latest_sensor
-    response = {
-            'sensors': axes,
-            'control': {
-                    'error' : controlThread.last_error,
-                    'integral_error' : controlThread.integral_error,
-                    'u' : controlThread.u,
-                    'dt' : controlThread.dt,
-                }
-        }
-    
-    return response
+    logDataSetBuffer = controlThread.getLogDataSetBuffer()
+    # return the logDataSetBuffer's latest state
+    response.content_type = "application/json"    
+    return dumps(logDataSetBuffer, default=lambda o: o.__dict__)
 
 bottle_thread = Thread(target=web_server.run, kwargs=dict(host='0.0.0.0', port=8080, debug=True))
 bottle_thread.daemon = True

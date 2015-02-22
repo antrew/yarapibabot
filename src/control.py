@@ -8,6 +8,7 @@ from motor import Motor
 from mpu6050 import MPU6050
 from ports import port_motor_left_backward, port_motor_left_forward, port_motor_right_backward, port_motor_right_forward, \
     port_motor_left_pwm, port_motor_right_pwm
+from log_data_set import LogDataSet
 
 
 class ControlThread(Thread):
@@ -16,7 +17,7 @@ class ControlThread(Thread):
         Thread.__init__(self, group=group, target=target, name=name, args=args, kwargs=kwargs, verbose=verbose)
         self.angle = 0
         self.K = 0.98
-
+        self.logDataSetBuffer = []
         # TODO find better values
 #         Ku = 10
 #         Pu = 0.5
@@ -50,6 +51,9 @@ class ControlThread(Thread):
             self.perform_one_step()
 
     def perform_one_step(self):
+        # create an object for logging the current sensors' data and current control data
+        currentLogDataSet = LogDataSet()
+        
         # read sensors
         axes = self.accelerometer.getAxes(True)
         self.latest_sensor = axes
@@ -58,6 +62,9 @@ class ControlThread(Thread):
         accelerometerAngle = atan2(-x, -z)
         # read gyroscope
         gyroscopeRate = -axes['gy'] / 180 * math.pi
+        
+        # log the values from the sensors
+        currentLogDataSet.setSensorsValues(x, z, gyroscopeRate)
         
         # calculate dt based on the current time and the previous measurement time
         now = time()
@@ -77,6 +84,10 @@ class ControlThread(Thread):
         u = self.Kp * error + self.Ki * self.integral_error + self.Kd * differential_error
         self.u = u
         
+        # log the calculated control values
+        currentLogDataSet.setControlValues(accelerometerAngle, self.angle, error, self.integral_error, differential_error, u, dt)
+        # append the current logDataSet object to the logging-buffer
+        self.logDataSetBuffer.append(currentLogDataSet)
         self.logger.debug(
             'x={:5.2f} z={:5.2f} gy={:7.2f} accelAngle={:5.2f} gyrAngle={:5.2f} angle={:5.2f} e={:5.2f} ie={:5.2f} de={:5.2f} u={:5.2f} dt={:3.0f}'
                 .format(
@@ -87,3 +98,10 @@ class ControlThread(Thread):
         self.motor_right.set_value(u, dt)
 
         #sleep(10. / 1000.)
+    
+    # return a copy of the current logDataSetBuffer and then empty the logDataSetBuffer     
+    def getLogDataSetBuffer(self):
+        # TODO synchronize this with the control loop thread
+        data = self.logDataSetBuffer
+        self.logDataSetBuffer=[]
+        return data
