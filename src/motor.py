@@ -18,9 +18,9 @@ class Motor:
         wiringpi2.pinMode(self.forward_port, wiringpi2.GPIO.OUTPUT)
         
         wiringpi2.pwmSetMode(wiringpi2.GPIO.PWM_MODE_MS);
-        self.pwm_range = 1024
+        self.pwm_range = 100
         wiringpi2.pwmSetRange(self.pwm_range)
-        wiringpi2.pwmSetClock(2)
+        wiringpi2.pwmSetClock(1)
         # pwmFrequency in Hz = 19.2 MHz / pwmClock / pwmRange
         self.logger = logging.getLogger(__name__)
         
@@ -57,4 +57,4 @@ class Motor:
         power = int(self.pwm_range * target)
         wiringpi2.pwmWrite(self.pwm_port, power)
 
-        self.logger.debug("{}: target={:5.2f} backward_value={:1d} forward_value={:1d} power={:4d}".format(self.name, target, backward_value, forward_value, power))
+        self.logger.debug("{}: target={:5.2f} backward_value={:1d} forward_value={:1d} power={:4d}/{:4d}".format(self.name, target, backward_value, forward_value, power, self.pwm_range))
