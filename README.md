@@ -34,6 +34,11 @@ clone WiringPi2-Python and add it as an external library to "PyDev - PYTHONPATH"
 
 git clone git@github.com:Gadgetoid/WiringPi2-Python.git
 
+### configobj
+On RaspberryPi and development machine:
+
+pip install configobj
+
 ### Configure a key-based access to Raspberry Pi
 
 Generate a key with ssh-keygen if you don't have one

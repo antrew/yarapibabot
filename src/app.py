@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from json import dumps
 import logging
 import sys
 from threading import Thread
@@ -6,20 +7,22 @@ import time
 
 import wiringpi2
 
+from Config import Config
 from bottle import Bottle, response
 from control import ControlThread
 import ports
-from json import dumps
 
 
 logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
 
+config = Config()
+
 # start the main control thread
 global controlThread
 
-controlThread = ControlThread()
+controlThread = ControlThread(config)
 controlThread.daemon = True
 controlThread.start()
 

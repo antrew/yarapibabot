@@ -4,39 +4,31 @@ import math
 from threading import Thread
 from time import time, sleep
 
+from log_data_set import LogDataSet
 from motor import Motor
 from mpu6050 import MPU6050
 from ports import port_motor_left_backward, port_motor_left_forward, port_motor_right_backward, port_motor_right_forward, \
     port_motor_left_pwm, port_motor_right_pwm
-from log_data_set import LogDataSet
 
 
 class ControlThread(Thread):
-    def __init__(self, group=None, target=None, name=None,
-        args=(), kwargs=None, verbose=None):
-        Thread.__init__(self, group=group, target=target, name=name, args=args, kwargs=kwargs, verbose=verbose)
+    def __init__(self, config):
+        Thread.__init__(self)
         self.angle = 0
         self.K = 0.98
         self.logDataSetBuffer = []
-        # TODO find better values
-#         Ku = 10
-#         Pu = 0.5
-#         self.Kp = 0.6 * Ku
-#         self.Ki = 2 * self.Kp * Pu
-#         self.Kd = self.Kp * Pu / 8
 
-        self.Kp = 6
-        self.Ki = 0
-        self.Kd = 0
-        
-        self.set_point = 0.06
+        self.Kp = config.config.as_float('Kp')
+        self.Ki = config.config.as_float('Ki')
+        self.Kd = config.config.as_float('Kd')
+        self.set_point = config.config.as_float('set_point')
+        self.disable_motors = config.config.as_bool('disable_motors')
         
         self.integral_error = 0
         self.last_error = 0
         self.motor_left = Motor("L", port_motor_left_pwm, port_motor_left_backward, port_motor_left_forward)
         self.motor_right = Motor("R", port_motor_right_pwm, port_motor_right_backward, port_motor_right_forward)
         
-        # self.accelerometer = ADXL345()
         self.accelerometer = MPU6050()
 
         self.last_time = time()
@@ -45,6 +37,14 @@ class ControlThread(Thread):
 
         self.setDaemon(True)
         self.latest_sensor = 0
+        
+        self.logger.info('Initialized ControlThread with the following settings')
+        self.logger.info('disable_motors={}'.format(self.disable_motors))
+        self.logger.info('set_point={:1.2f}'.format(self.set_point))
+        self.logger.info('Kp={:1.1f}'.format(self.Kp))
+        self.logger.info('Ki={:1.1f}'.format(self.Ki))
+        self.logger.info('Kd={:1.1f}'.format(self.Kd))
+
 
     def run(self):
         while True:
@@ -98,8 +98,9 @@ class ControlThread(Thread):
                     x, z, gyroscopeRate, accelerometerAngle, gyroscopeRate * dt, self.angle, error, self.integral_error, differential_error, u, dt * 1000))
         
         # control the motors
-        self.motor_left.set_value(u, dt)
-        self.motor_right.set_value(u, dt)
+        if not self.disable_motors:
+            self.motor_left.set_value(u, dt)
+            self.motor_right.set_value(u, dt)
 
         #sleep(10. / 1000.)
     
