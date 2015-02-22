@@ -64,7 +64,7 @@ class ControlThread(Thread):
         gyroscopeRate = -axes['gy'] / 180 * math.pi
         
         # log the values from the sensors
-        currentLogDataSet.setSensorsValues(x, z, gyroscopeRate)
+        currentLogDataSet.setSensorsValues(axes, gyroscopeRate)
         
         # calculate dt based on the current time and the previous measurement time
         now = time()
@@ -88,6 +88,10 @@ class ControlThread(Thread):
         currentLogDataSet.setControlValues(accelerometerAngle, self.angle, error, self.integral_error, differential_error, u, dt)
         # append the current logDataSet object to the logging-buffer
         self.logDataSetBuffer.append(currentLogDataSet)
+        # limit the size of the buffer
+        if len(self.logDataSetBuffer) > 500: 
+            del self.logDataSetBuffer[0]
+            
         self.logger.debug(
             'x={:5.2f} z={:5.2f} gy={:7.2f} accelAngle={:5.2f} gyrAngle={:5.2f} angle={:5.2f} e={:5.2f} ie={:5.2f} de={:5.2f} u={:5.2f} dt={:3.0f}'
                 .format(

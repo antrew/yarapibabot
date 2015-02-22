@@ -2,9 +2,29 @@
 class LogDataSet():
 	def __init__(self):
 		# sensors' values
-		self.x = None
-		self.z = None
+		self.sensors = LogSensorsData()
+		# control values
+		self.control = LogControlData()
+	
+	def setSensorsValues(self, axes, gyroscopeRate):
+		# set sensors' values
+		self.sensors = axes
+		self.sensors["gyroscopeRate"] = gyroscopeRate
+		#self.sensors.setSensorsValues(axes, gyroscopeRate)
+		
+	def setControlValues(self, accelerometerAngle, angle, error, integral_error, differential_error, u, dt):
+		# set the control values
+		self.control.setControlValues(accelerometerAngle, angle, error, integral_error, differential_error, u, dt)
+		
+		
+class LogSensorsData:
+	def __init__(self):
+		# sensors' values
+		self.axes = None
 		self.gyroscopeRate = None
+		
+class LogControlData:
+	def __init__(self):
 		# control values
 		self.accelerometerAngle = None
 		self.angle = None
@@ -14,12 +34,6 @@ class LogDataSet():
 		self.u = None
 		self.dt = None
 	
-	def setSensorsValues(self, x, z, gyroscopeRate):
-		# set sensors' values
-		self.x = x
-		self.z = z
-		self.gyroscopeRate = gyroscopeRate
-		
 	def setControlValues(self, accelerometerAngle, angle, error, integral_error, differential_error, u, dt):
 		# set the control values
 		self.accelerometerAngle = accelerometerAngle
