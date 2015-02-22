@@ -59,6 +59,8 @@ try:
 
 except (KeyboardInterrupt, SystemExit):
     print "caught exception, exiting..."
+    wiringpi2.pwmWrite(ports.port_motor_left_pwm, 0)
+    wiringpi2.pwmWrite(ports.port_motor_right_pwm, 0)
     wiringpi2.digitalWrite(ports.port_motor_left_backward, wiringpi2.GPIO.LOW)
     wiringpi2.digitalWrite(ports.port_motor_left_forward, wiringpi2.GPIO.LOW)
     wiringpi2.digitalWrite(ports.port_motor_right_backward, wiringpi2.GPIO.LOW)

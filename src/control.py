@@ -1,12 +1,13 @@
-from math import atan2
 import logging
+from math import atan2
+import math
 from threading import Thread
 from time import time, sleep
 
 from motor import Motor
 from mpu6050 import MPU6050
-from ports import port_motor_left_backward, port_motor_left_forward, port_motor_right_backward, port_motor_right_forward
-import math
+from ports import port_motor_left_backward, port_motor_left_forward, port_motor_right_backward, port_motor_right_forward, \
+    port_motor_left_pwm, port_motor_right_pwm
 
 
 class ControlThread(Thread):
@@ -16,17 +17,23 @@ class ControlThread(Thread):
         self.angle = 0
         self.K = 0.98
 
-        # TODO find better values        
+        # TODO find better values
+#         Ku = 10
+#         Pu = 0.5
+#         self.Kp = 0.6 * Ku
+#         self.Ki = 2 * self.Kp * Pu
+#         self.Kd = self.Kp * Pu / 8
+
         self.Kp = 6
         self.Ki = 0
         self.Kd = 0
         
-        self.set_point = 0 #0.09
+        self.set_point = 0.06
         
         self.integral_error = 0
         self.last_error = 0
-        self.motor_left = Motor("L", port_motor_left_backward, port_motor_left_forward)
-        self.motor_right = Motor("R", port_motor_right_backward, port_motor_right_forward)
+        self.motor_left = Motor("L", port_motor_left_pwm, port_motor_left_backward, port_motor_left_forward)
+        self.motor_right = Motor("R", port_motor_right_pwm, port_motor_right_backward, port_motor_right_forward)
         
         # self.accelerometer = ADXL345()
         self.accelerometer = MPU6050()

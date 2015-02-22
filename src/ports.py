@@ -11,14 +11,20 @@ led_output_port=1
 
 # MOTOR DRIVER PORTS
 
-# input 1 of the driver
+# enable A of the H-bridge
+port_motor_left_pwm = 18
+
+# input 1 of the H-bridge
 port_motor_left_backward=6
 
-# input 2 of the driver
-port_motor_left_forward=13
+# input 2 of the H-bridge
+port_motor_left_forward=16
 
-# input 3 of the driver
-port_motor_right_backward=19
+# enable B of the H-bridge
+port_motor_right_pwm = 13
 
-# input 4 of the driver
+# input 3 of the H-bridge
+port_motor_right_backward=20
+
+# input 4 of the H-bridge
 port_motor_right_forward=26
