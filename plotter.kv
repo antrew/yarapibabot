@@ -1,0 +1,41 @@
+#:kivy 1.7.2
+<SensorGraph@Graph>:
+    xlabel: 'time'
+    x_ticks_minor: 5
+    x_ticks_major: 0.5
+    x_grid_label: False
+    y_grid_label: True
+    xlog: False
+    ylog: False
+    x_grid: True
+    y_grid: True
+    xmin: 0
+    xmax: 1
+    label_options: {'bold': True}
+    size_hint_y: 0.9  
+
+<SensorsBoxLayout>:
+    orientation: 'vertical'
+    SensorGraph:
+        id: accel_graph
+        ylabel: 'accelerometer values'
+        ymin: -2
+        ymax: 2
+        y_ticks_minor: 5
+        y_ticks_major: 0.5
+           
+    SensorGraph:
+        id: gyro_graph
+        ylabel: 'gyroscope values'
+        ymin: -90
+        ymax: 90
+        y_ticks_minor: 3
+        y_ticks_major: 30
+
+    SensorGraph:
+        id: control_graph
+        ylabel: 'control values'
+        ymin: -0.5
+        ymax: 0.5
+        y_ticks_minor: 5
+        y_ticks_major: 0.5
