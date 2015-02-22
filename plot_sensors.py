@@ -9,6 +9,7 @@ from kivy.uix.boxlayout import BoxLayout
 from math import exp
 
 from kivy.garden.graph import Graph, MeshLinePlot
+from twisted.internet.error import ConnectionRefusedError
 
 
 kivy.require('1.7.2')
@@ -119,7 +120,7 @@ class PlotSensorsApp(App):
         def plot_sensors_callback(dt):
             # True - use real HTTP server
             # False - use fake values
-            if False:
+            if True:
                 sensor_data = self.get_sensors_data()
             else:
                 sensor_data = self.get_fake_sensor_data()
@@ -131,9 +132,13 @@ class PlotSensorsApp(App):
     
     def get_sensors_data(self):
         connection = httplib.HTTPConnection('raspberrypi:8080')
-        connection.request('GET', '/sensors')
-        response = connection.getresponse()
-        axes = json.load(response)
+        try:
+            connection.request('GET', '/sensors')
+            response = connection.getresponse()
+            axes = json.load(response)
+        except:
+            # keep running if the server becomes unavailable
+            axes=[]
         return axes
 
     def get_fake_sensor_data(self):
