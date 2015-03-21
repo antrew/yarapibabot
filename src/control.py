@@ -93,7 +93,7 @@ class ControlThread(Thread):
             del self.logDataSetBuffer[0]
             
         self.logger.debug(
-            'x={:5.2f} z={:5.2f} gy={:7.2f} accelAngle={:5.2f} gyrAngle={:5.2f} angle={:5.2f} e={:5.2f} ie={:5.2f} de={:5.2f} u={:5.2f} dt={:3.0f}'
+            'x={:5.2f} z={:5.2f} gy={:7.2f} accelAngle={:5.2f} gyrAngle={:5.2f} angle={:6.3f} e={:6.3f} ie={:6.3f} de={:5.2f} u={:5.2f} dt={:3.0f}'
                 .format(
                     x, z, gyroscopeRate, accelerometerAngle, gyroscopeRate * dt, self.angle, error, self.integral_error, differential_error, u, dt * 1000))
         
