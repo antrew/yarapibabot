@@ -56,3 +56,4 @@ target/
 .pydevproject
 .settings/
 src/override.ini
+deploy.settings
