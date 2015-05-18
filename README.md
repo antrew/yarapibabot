@@ -37,9 +37,9 @@ git clone git@github.com:Gadgetoid/WiringPi2-Python.git
 ### configobj
 On RaspberryPi and development machine:
 
-pip install configobj
+    pip install configobj
+    apt-get install python-smbus
 
 ### Configure a key-based access to Raspberry Pi
 
 Generate a key with ssh-keygen if you don't have one
-

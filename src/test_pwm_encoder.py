@@ -8,7 +8,9 @@ import wiringpi2
 from encoder_reader import EncoderReader
 from ports import port_motor_left_forward, port_motor_right_forward, \
     port_motor_left_backward, port_motor_right_backward, \
-    port_motor_left_pwm, port_motor_right_pwm
+    port_motor_left_pwm, port_motor_right_pwm, port_encoder_left_a, \
+    port_encoder_left_b, port_encoder_right_a, port_encoder_right_b
+
 
 # ./test_pwm_encoder.py 20 100
 pwm_divisor = int(sys.argv[1])
@@ -29,7 +31,8 @@ frequency = 19200000 / pwm_divisor / pwm_range
 
 print ("frequency={} Hz (divisor={}, range={})".format(frequency, pwm_divisor, pwm_range))
 
-encoder = EncoderReader(17, 27)
+#encoderLeft = EncoderReader(port_encoder_left_a, port_encoder_left_b)
+encoderRight = EncoderReader(port_encoder_right_a, port_encoder_right_b)
 
 def shutdown():
     wiringpi2.pwmWrite(port_motor_left_pwm, 0)
@@ -44,7 +47,8 @@ def shutdown():
 
 try:
     percentage = 0
-    previousCounter = 0
+    previousCounterLeft = 0
+    previousCounterRight = 0
     while percentage < 100:
         pwm_value = pwm_range * percentage / 100
         wiringpi2.digitalWrite(port_motor_left_forward, wiringpi2.GPIO.HIGH)
@@ -53,12 +57,21 @@ try:
         wiringpi2.pwmWrite(port_motor_right_pwm, pwm_value)
 
         time.sleep(1)
-        counter = encoder.getCounterValue()
-        steps = counter - previousCounter
-        previousCounter = counter
-        print ("percentage={} counter={} steps={}".format(percentage, counter, steps))
+
+        #counterLeft = encoderLeft.getCounterValue()
+        #stepsLeft = counterLeft - previousCounterLeft
+        #previousCounterLeft = counterLeft
+        counterLeft=0
+        stepsLeft=0
         
-#         if counter < -10 or counter > 10:
+        counterRight = encoderRight.getCounterValue()
+        stepsRight = counterRight - previousCounterRight
+        previousCounterRight = counterRight
+        
+        
+        print ("percentage={} counterLeft={} stepsLeft={} counterRight={} stepsRight={}".format(percentage, counterLeft, stepsLeft, counterRight, stepsRight))
+        
+#         if counterLeft < -10 or counterLeft > 10:
 #             print ("detected movement at {}".format(percentage))
 #             break
         percentage += 1

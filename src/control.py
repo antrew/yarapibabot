@@ -55,13 +55,19 @@ class ControlThread(Thread):
         currentLogDataSet = LogDataSet()
         
         # read sensors
-        axes = self.accelerometer.getAxes(True)
+        try:
+            # this gives IOError sometimes
+            axes = self.accelerometer.getAxes(True)
+        except (IOError):
+            # error, do nothing, try again
+            return
+
         self.latest_sensor = axes
         z = axes['z']
-        x = axes['x']
-        accelerometerAngle = atan2(-x, -z)
+        x = axes['y']
+        accelerometerAngle = atan2(x, -z)
         # read gyroscope
-        gyroscopeRate = -axes['gy'] / 180 * math.pi
+        gyroscopeRate = -axes['gx'] / 180 * math.pi
         
         # log the values from the sensors
         currentLogDataSet.setSensorsValues(axes, gyroscopeRate)
@@ -80,8 +86,11 @@ class ControlThread(Thread):
         self.integral_error += error * dt
         differential_error = (error - self.last_error) / dt
         self.last_error = error
-        
-        u = self.Kp * error + self.Ki * self.integral_error + self.Kd * differential_error
+
+        up = self.Kp * error
+        ui = self.Ki * self.integral_error
+        ud = self.Kd * differential_error
+        u = up + ui + ud
         self.u = u
         
         # log the calculated control values
@@ -93,20 +102,20 @@ class ControlThread(Thread):
             del self.logDataSetBuffer[0]
             
         self.logger.debug(
-            'x={:5.2f} z={:5.2f} gy={:7.2f} accelAngle={:5.2f} gyrAngle={:5.2f} angle={:6.3f} e={:6.3f} ie={:6.3f} de={:5.2f} u={:5.2f} dt={:3.0f}'
+            'x={:5.2f} z={:5.2f} gy={:7.2f} accelAngle={:5.2f} gyrAngle={:6.3f} angle={:6.3f} e={:6.3f} ie={:6.3f} de={:5.2f} up={:5.2f} ui={:5.2f} ud={:5.2f} u={:5.2f} dt={:3.0f}'
                 .format(
-                    x, z, gyroscopeRate, accelerometerAngle, gyroscopeRate * dt, self.angle, error, self.integral_error, differential_error, u, dt * 1000))
+                    x, z, gyroscopeRate, accelerometerAngle, gyroscopeRate * dt, self.angle, error, self.integral_error, differential_error, up, ui, ud, u, dt * 1000))
         
         # control the motors
         if not self.disable_motors:
             self.motor_left.set_value(u, dt)
             self.motor_right.set_value(u, dt)
 
-        #sleep(10. / 1000.)
+#         sleep(20. / 1000.)
     
     # return a copy of the current logDataSetBuffer and then empty the logDataSetBuffer     
     def getLogDataSetBuffer(self):
         # TODO synchronize this with the control loop thread
         data = self.logDataSetBuffer
-        self.logDataSetBuffer=[]
+        self.logDataSetBuffer = []
         return data

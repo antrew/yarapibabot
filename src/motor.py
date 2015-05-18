@@ -22,12 +22,13 @@ class Motor:
         # divisor = 2
         # range = 500
         # dead zone <= 53%
+
         self.mapping_u = [0, 1, 100]
-        #self.mapping_pwm = [0, 53, 100]
-        self.mapping_pwm = [0, 53, 100]
+        self.mapping_pwm = [0, 20, 100]
         
         wiringpi2.pwmSetMode(wiringpi2.GPIO.PWM_MODE_MS);
-        self.divisor = 2
+        # 480 Hz
+        self.divisor = 40
         self.pwm_range = 1000
         wiringpi2.pwmSetRange(self.pwm_range)
         wiringpi2.pwmSetClock(self.divisor)
